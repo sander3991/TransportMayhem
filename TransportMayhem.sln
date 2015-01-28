@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransportMayhem", "WindowsFormsApplication1\TransportMayhem.csproj", "{AAC7E8E2-69E1-4A9E-8A1E-24413F2F0FB3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransportMayhem", "TransportMayhem\TransportMayhem.csproj", "{AAC7E8E2-69E1-4A9E-8A1E-24413F2F0FB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
