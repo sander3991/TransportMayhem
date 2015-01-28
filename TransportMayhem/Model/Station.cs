@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TransportMayhem.View.GridRenderers;
 
 namespace TransportMayhem.Model
 {
@@ -11,6 +12,10 @@ namespace TransportMayhem.Model
     /// </summary>
     class Station : GridObject
     {
+        /// <summary>
+        /// The default renderer for a station object
+        /// </summary>
+        public override IGridRenderer GridRenderer { get { return Renderers.StationRenderer; } }
         /// <summary>
         /// Creates a station object
         /// </summary>

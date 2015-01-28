@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TransportMayhem.View;
+using TransportMayhem.View.GridRenderers;
 
 namespace TransportMayhem.Model
 {
@@ -15,7 +15,7 @@ namespace TransportMayhem.Model
         /// <summary>
         /// The rail object defaults to the RailRenderer
         /// </summary>
-        protected override IGridRenderer _defaultGridRenderer { get { return Renderers.RailRenderer; } }
+        public override IGridRenderer GridRenderer { get { return Renderers.RailRenderer; } }
         /// <summary>
         /// Creates a rail object at the specified location
         /// </summary>

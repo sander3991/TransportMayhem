@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TransportMayhem.View;
 
 namespace TransportMayhem.Model
 {
@@ -80,8 +81,12 @@ namespace TransportMayhem.Model
             Point p = new Point(go.X, go.Y);
             if (!CanObjectBeAdded(p, go.Width, go.Height)) return false;
             for (int x = 0; x < go.Width; x++)
-                for (int y = 0; y < go.Height; y++ )
-                    _gridObjects[go.X + x, go.Y + y] = go;
+                for (int y = 0; y < go.Height; y++)
+                {
+                    int newX = go.X + x, newY = go.Y + y;
+                    _gridObjects[newX, newY] = go;
+                    GraphicsEngine.UpdateGrid(newX, newY);
+                }
             return true;
         }
 

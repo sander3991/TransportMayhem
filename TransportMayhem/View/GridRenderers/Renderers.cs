@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TransportMayhem.Model;
 
-namespace TransportMayhem.View
+namespace TransportMayhem.View.GridRenderers
 {
     /// <summary>
     /// A list with available renderers
@@ -21,5 +21,9 @@ namespace TransportMayhem.View
         /// The track renderer
         /// </summary>
         public static readonly GridRailRenderer RailRenderer = new GridRailRenderer();
+        /// <summary>
+        /// The station renderer
+        /// </summary>
+        public static readonly GridStationRenderer StationRenderer = new GridStationRenderer();
     }
 }

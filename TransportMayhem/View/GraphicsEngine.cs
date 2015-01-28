@@ -48,6 +48,10 @@ namespace TransportMayhem.View
             set { GlobalVars.GRIDSIZE = value; }
         }
         /// <summary>
+        /// What points need to be updated
+        /// </summary>
+        private static List<Point> _updateGrids = new List<Point>();
+        /// <summary>
         /// Is the GraphicsEngine running?
         /// </summary>
         public bool IsRunning { get { return renderThread != null; } }
@@ -116,12 +120,12 @@ namespace TransportMayhem.View
 
             Bitmap frame = new Bitmap(CANVAS_WIDTH, CANVAS_HEIGHT); //This bitmap is used to draw upon on the loop, doing this allows us to only draw 1 image on the panel
             Graphics frameGraphics = Graphics.FromImage(frame); //Extract the graphics object from the Bitmap
-            
+            frameGraphics.Clear(Color.Red);
+            IterateGridObjects(frameGraphics);
             while (render)
             {
-                IterateGridObjects(frameGraphics); 
+                UpdateGrids(frameGraphics);
                 drawHandle.DrawImageUnscaled(frame, 0, 0);
-                frameGraphics.Clear(Color.Black); //Sets the Bitmap back to black to make sure the next rendering loop will be new
                 framesRendered++;
                 if (Environment.TickCount >= startTime + 1000) //Each second we update our frames
                 {
@@ -137,12 +141,50 @@ namespace TransportMayhem.View
             //Sets the renderthread to null, we're done with it
             renderThread = null;
         }
+
+
+
+        /// <summary>
+        /// Requests for the GraphicsEngine to update the grid
+        /// </summary>
+        /// <param name="x">The x location of the update</param>
+        /// <param name="y">The y location of the update</param>
+        public static void UpdateGrid(int x, int y)
+        {
+            UpdateGrid(new Point(x, y));
+        }
+        /// <summary>
+        /// Requests for the GraphicsEngine to update the grid
+        /// </summary>
+        /// <param name="p">The location of the update</param>
+        public static void UpdateGrid(Point p)
+        {
+            if (!_updateGrids.Contains(p)) _updateGrids.Add(p);
+        }
+
+        /// <summary>
+        /// Updates the grids that are marked for an update
+        /// </summary>
+        /// <param name="g">The graphics object</param>
+        private void UpdateGrids(Graphics g)
+        {
+            Grid grid = engine.Grid;
+            List<Point> list = new List<Point>(GraphicsEngine._updateGrids);
+            GraphicsEngine._updateGrids.Clear();
+            foreach (Point p in list)
+            {
+                DrawGridOutline(g, p);
+                DrawGridObject(g, p, grid[p]);
+            }
+        }
+
         /// <summary>
         /// Used to iterate over all gridobjects of a grid and call the required paint methods of those grids.
         /// </summary>
         /// <param name="g">The graphics to draw on</param>
         private void IterateGridObjects(Graphics g)
         {
+            _updateGrids.Clear();
             Grid grid = engine.Grid;
             Point p = new Point();
             for (int x = 0; x < grid.Width; x++)
@@ -153,7 +195,6 @@ namespace TransportMayhem.View
                     p.Y = y;
                     DrawGridOutline(g, p);
                     DrawGridObject(g, p, grid[p]);
-
                 }
             }
         }

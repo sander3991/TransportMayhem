@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TransportMayhem.View;
+using TransportMayhem.View.GridRenderers;
 
 namespace TransportMayhem.Model
 {
@@ -44,23 +44,12 @@ namespace TransportMayhem.Model
         /// The Top-most Left Y Location of this GridObject in the grid
         /// </summary>
         public int Y { get { return _y; } }
-        /// <summary>
-        /// The default renderer used by any GridObject unless overwritten
-        /// </summary>
-        protected virtual IGridRenderer _defaultGridRenderer { get { return Renderers.DefaultRenderer; } }
-        /// <summary>
-        /// The custom renderer if set
-        /// </summary>
-        private IGridRenderer _gridRenderer;
+
         /// <summary>
         /// The Grid renderer that is used to render this object
         /// </summary>
-        public IGridRenderer GridRenderer {
-            private set { _gridRenderer = value; } 
-            get {
-                if (_gridRenderer != null) return _gridRenderer;
-                else return _defaultGridRenderer; 
-            } 
+        public virtual IGridRenderer GridRenderer {
+            get { return Renderers.DefaultRenderer; } 
         }
         /// <summary>
         /// Creates the skeleton of a GridObject consisting out of a position and optional width and height which both default to 1.
@@ -80,12 +69,5 @@ namespace TransportMayhem.Model
             _width = width;
             _height = height;
         }
-
-        protected void SetGridRenderer(IGridRenderer renderer)
-        {
-            if (GridRenderer != renderer)
-                GridRenderer = renderer;
-        }
-
     }
 }

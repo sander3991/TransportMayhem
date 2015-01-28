@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TransportMayhem.Model;
 
-namespace TransportMayhem.View
+namespace TransportMayhem.View.GridRenderers
 {
     /// <summary>
     /// The interface to render a grid object
