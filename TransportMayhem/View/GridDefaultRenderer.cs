@@ -8,6 +8,9 @@ using TransportMayhem.Model;
 
 namespace TransportMayhem.View
 {
+    /// <summary>
+    /// The default grid renderer for Transport Mayhem. Requires the objecttype to register itself using the RegisterTypeRenderer method
+    /// </summary>
     class GridDefaultRenderer : IGridRenderer
     {
         /// <summary>
@@ -15,13 +18,21 @@ namespace TransportMayhem.View
         /// </summary>
         private Dictionary<Type, Bitmap> renderMaps;
         private Bitmap _defaultTexture = Properties.Resources.Missing_Texture;
-
+        /// <summary>
+        /// Creates a default renderer
+        /// </summary>
         public GridDefaultRenderer()
         {
             renderMaps = new Dictionary<Type, Bitmap>();
         }
 
-
+        /// <summary>
+        /// Register a bitmap to a type of an object.
+        /// </summary>
+        /// <param name="type">The type of the object</param>
+        /// <param name="map">The bitmap to register.</param>
+        /// <param name="width">Optional width in grid squares, defaults to 1</param>
+        /// <param name="height">Optional height in grid squares, defaults to 1</param>
         public void RegisterTypeRenderer(Type type, Bitmap map, int width = 1, int height = 1)
         {
             if (map.Width * height != map.Height * width) throw new ArgumentException("The supplied bitmap is not a square, or not in the given dimennsions");

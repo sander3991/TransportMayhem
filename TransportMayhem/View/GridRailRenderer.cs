@@ -8,10 +8,15 @@ using TransportMayhem.Model;
 
 namespace TransportMayhem.View
 {
+    /// <summary>
+    /// Renders rails in a grid
+    /// </summary>
     class GridRailRenderer : IGridRenderer
     {
         private Bitmap rail = Properties.Resources.Rail;
-
+        /// <summary>
+        /// Creates a new object of a GridRailRenderer
+        /// </summary>
         public GridRailRenderer()
         {
             Bitmap map = Properties.Resources.Rail;

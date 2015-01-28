@@ -137,7 +137,10 @@ namespace TransportMayhem.View
             //Sets the renderthread to null, we're done with it
             renderThread = null;
         }
-
+        /// <summary>
+        /// Used to iterate over all gridobjects of a grid and call the required paint methods of those grids.
+        /// </summary>
+        /// <param name="g">The graphics to draw on</param>
         private void IterateGridObjects(Graphics g)
         {
             Grid grid = engine.Grid;
