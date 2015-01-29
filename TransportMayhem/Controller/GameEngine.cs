@@ -24,6 +24,7 @@ namespace TransportMayhem.Controller
         {
             get { return _grid; }
         }
+        public bool IsGraphicsRunning { get { return graphics != null && graphics.IsRunning; } }
 
         public GameEngine(GameWindow form)
         {
@@ -41,7 +42,9 @@ namespace TransportMayhem.Controller
             if (button == System.Windows.Forms.MouseButtons.Left)
             {
                 Point p = GraphicsEngine.TranslateToGrid(x, y);
-                _grid.AddObject(new Rail(p.X, p.Y));
+                GridObject go = InputHandler.GetNewObject(p.X, p.Y, 1, 1);
+                if(go != null)
+                    _grid.AddObject(go);
             }
         }
 

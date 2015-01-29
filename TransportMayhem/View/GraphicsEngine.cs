@@ -159,7 +159,10 @@ namespace TransportMayhem.View
         /// <param name="p">The location of the update</param>
         public static void UpdateGrid(Point p)
         {
-            if (!_updateGrids.Contains(p)) _updateGrids.Add(p);
+            lock (_updateGrids)
+            {
+                if (!_updateGrids.Contains(p)) _updateGrids.Add(p);
+            }
         }
 
         /// <summary>
@@ -169,12 +172,14 @@ namespace TransportMayhem.View
         private void UpdateGrids(Graphics g)
         {
             Grid grid = engine.Grid;
-            List<Point> list = new List<Point>(GraphicsEngine._updateGrids);
-            GraphicsEngine._updateGrids.Clear();
-            foreach (Point p in list)
+            lock (GraphicsEngine._updateGrids)
             {
-                DrawGridOutline(g, p);
-                DrawGridObject(g, p, grid[p]);
+                foreach (Point p in GraphicsEngine._updateGrids)
+                {
+                    DrawGridOutline(g, p);
+                    DrawGridObject(g, p, grid[p]);
+                }
+                GraphicsEngine._updateGrids.Clear();
             }
         }
 

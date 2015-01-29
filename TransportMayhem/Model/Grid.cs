@@ -95,7 +95,7 @@ namespace TransportMayhem.Model
         /// </summary>
         /// <param name="p">The point where to get the GridObject</param>
         /// <returns>The GridObject at the point, or null when no GridObject exists</returns>
-        public GridObject this[System.Drawing.Point p]
+        public GridObject this[Point p]
         {
             get 
             {

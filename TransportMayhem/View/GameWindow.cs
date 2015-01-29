@@ -20,20 +20,49 @@ namespace TransportMayhem
         /// The GameEngine that runs the entire game
         /// </summary>
         private GameEngine game;
+
         /// <summary>
         /// Initialize the components and the GameEngine
         /// </summary>
         public GameWindow()
         {
-            InitializeComponent();
             game = new GameEngine(this);
+            InitializeComponent();
+            Tuple<Type, Bitmap>[] createButtons = new Tuple<Type, Bitmap>[]
+            {
+                new Tuple<Type, Bitmap>(typeof(TransportMayhem.Model.Rail), Properties.Resources.Rail),
+                new Tuple<Type, Bitmap>(typeof(TransportMayhem.Model.Station), Properties.Resources.Station_Hori)
+            };
+            for (int i = 0; i < createButtons.Length; i++)
+            {
+                Button button = CreateSelectButton(createButtons[i], i);
+                this.Controls.Add(button);
+                button.BringToFront();
+            }
+
+        }
+
+        private Button CreateSelectButton(Tuple<Type, Bitmap> data, int id)
+        {
+            Button button = new Button();
+
+            button.Location = new Point(id * 40, 0);
+            button.Name = "button" + id;
+            button.Size = new Size(40, 40);
+            button.TabIndex = 0;
+            button.Image = new Bitmap(data.Item2, new Size(40, 40));
+            button.UseVisualStyleBackColor = true;
+            button.Tag = data.Item1;
+            button.Click += OnClick_Item;
+            return button;
         }
         /// <summary>
         /// When the paint method is called, we use the graphics of our canvas object to do the rendering in a seperate thread.
         /// </summary>
         private void canvas_Paint(object sender, PaintEventArgs e)
         {
-            game.StartGraphics(canvas.CreateGraphics());
+            if(!game.IsGraphicsRunning)
+                game.StartGraphics(canvas.CreateGraphics());
         }
         /// <summary>
         /// If the console is enabled, we load that aswell when the form is loaded
@@ -52,6 +81,14 @@ namespace TransportMayhem
         {
             _stopping = true;
             game.StopGame();
+        }
+
+        private void OnClick_Item(object sender, EventArgs e)
+        {
+            Button button = sender as Button;
+            if (button == null) return;
+            Type type = button.Tag as Type;
+            InputHandler.InputType = type;
         }
     }
 }

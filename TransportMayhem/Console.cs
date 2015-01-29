@@ -284,7 +284,7 @@ namespace TransportMayhem
             int left = Console.CursorLeft;
             int top = Console.CursorTop;
             Console.SetCursorPosition(0, title.Length);
-            Console.WriteLine("FPS: {0}", _fps);
+            Console.WriteLine("FPS: {0,3}", _fps);
             Console.WriteLine(new string('-', Console.WindowWidth - 1));
             Console.SetCursorPosition(left, Math.Max(top, Console.CursorTop));
         }
