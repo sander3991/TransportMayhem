@@ -14,6 +14,7 @@ namespace TransportMayhem
         [STAThread]
         static void Main(string[] args)
         {
+            args = new string[] { "-console" };
             if (args.Contains("-console"))
                 GlobalVars.CONSOLE = true;
             Application.EnableVisualStyles();

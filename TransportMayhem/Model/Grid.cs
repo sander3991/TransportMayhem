@@ -4,6 +4,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TransportMayhem.Controller;
+using TransportMayhem.Model.GridObjects;
+using TransportMayhem.Model.MovingObjects;
 using TransportMayhem.View;
 
 namespace TransportMayhem.Model
@@ -17,6 +20,18 @@ namespace TransportMayhem.Model
         /// Keeps track of all the gridobjects in the field
         /// </summary>
         private GridObject[,] _gridObjects;
+        /// <summary>
+        /// Private field containing the moving objects
+        /// </summary>
+        private List<MovingObject> _movingObjects;
+        /// <summary>
+        /// A list containing all the moving objects in the field
+        /// </summary>
+        public List<MovingObject> MovingObjects { get { return _movingObjects; } }
+        /// <summary>
+        /// A list containg updateable objects
+        /// </summary>
+        private List<IUpdateable> _updateableObjects;
         /// <summary>
         /// The width of the grid in amount of squares
         /// </summary>
@@ -39,20 +54,44 @@ namespace TransportMayhem.Model
         {
             get { return _height; }
         }
+
+        public event Action<GameObject> ObjectAdded;
+        public event Action<GameObject> ObjectRemoved;
+        public event Action<RailArgs> RailAdded;
+        public event Action<RailArgs> RailRemoved;
+
+        /// <summary>
+        /// The GameEngine that's running this grid
+        /// </summary>
+        private GameEngine engine;
         /// <summary>
         /// Create a new grid
         /// </summary>
         /// <param name="width">The width in amount of squares</param>
         /// <param name="height">The height in amount of squares</param>
-        public Grid(int width, int height)
+        public Grid(GameEngine engine, int width, int height)
         {
             if (width < 1) throw new ArgumentException("Width cannot be lower then 1 wide");
             if (height < 1) throw new ArgumentException("Height cannot be lower then 1 high");
             _gridObjects = new GridObject[width, height];
+            _movingObjects = new List<MovingObject>();
+            _updateableObjects = new List<IUpdateable>();
             _width = width;
             _height = height;
-            AddObject(new Rail(1, 1));
-            AddObject(new Station(2, 1, 5, 3));
+            engine.Tick += OnUpdate;
+            this.engine = engine;
+        }
+
+        private void OnUpdate()
+        {
+            bool doSlowUpdate = (engine.TickCounter % 6) == 0;
+            foreach (IUpdateable updateable in _updateableObjects)
+            {
+                updateable.QuickUpdate();
+                if (doSlowUpdate)
+                    updateable.SlowUpdate();
+
+            }
         }
 
         /// <summary>
@@ -64,10 +103,40 @@ namespace TransportMayhem.Model
         /// <returns>True if an object can be placed given these parameters, otherwise false</returns>
         public bool CanObjectBeAdded(Point location, int width = 1, int height = 1)
         {
-            if (width < 1 || height < 1) throw new ArgumentException("Invalid width or height given to CanObjectBeAdded method. Integers must be 1 or higher");
+            if (width < 1 || height < 1) return false;
             for(int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
                     if (_gridObjects[location.X + x, location.Y + y] != null) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Do some general registering for all gameobjects
+        /// </summary>
+        /// <param name="go">The game object that is registered</param>
+        private void RegisterObject(GameObject go)
+        {
+            IUpdateable updateable = go as IUpdateable;
+            if (updateable != null)
+                if (!_updateableObjects.Contains(updateable))
+                    _updateableObjects.Add(updateable);
+            IRail rail = go as IRail;
+            if (rail != null && RailAdded != null)
+                RailAdded(new RailArgs(rail, go));
+            if(ObjectAdded != null)
+                ObjectAdded(go);
+        }
+
+        /// <summary>
+        /// Add a moving object to the grid
+        /// </summary>
+        /// <param name="mo">The moving object to add</param>
+        /// <returns>True if an object can be placed, otherwise false</returns>
+        public bool AddObject(MovingObject mo)
+        {
+            if (_movingObjects.Contains(mo)) return false;
+            _movingObjects.Add(mo);
+            RegisterObject(mo);
             return true;
         }
 
@@ -87,7 +156,45 @@ namespace TransportMayhem.Model
                     _gridObjects[newX, newY] = go;
                     GraphicsEngine.UpdateGrid(newX, newY);
                 }
+            RegisterObject(go);
             return true;
+        }
+
+        private void UnregisterObject(GameObject go)
+        {
+            IUpdateable updateable = go as IUpdateable;
+            if (updateable != null && _updateableObjects.Contains(updateable))
+                _updateableObjects.Remove(updateable);
+            IRail rail = go as IRail;
+            if (rail != null && RailRemoved != null)
+                RailRemoved(new RailArgs(rail, go));
+            if (ObjectRemoved != null) ObjectRemoved(go);
+        }
+
+        public bool RemoveObject(GridObject go)
+        {
+            if (go == _gridObjects[go.X, go.Y])
+            {
+                _gridObjects[go.X, go.Y] = null;
+                UnregisterObject(go);
+                return true;
+            }
+            return false;
+        }
+
+        public bool RemoveObject(MovingObject mo)
+        {
+            if (_movingObjects.Contains(mo))
+            {
+                _movingObjects.Remove(mo);
+                UnregisterObject(mo);
+            }
+            return false;
+        }
+
+        public bool InBounds(Point p)
+        {
+            return p.X >= 0 && p.X < _width && p.Y >= 0 && p.Y < _height;
         }
 
         /// <summary>
@@ -99,7 +206,7 @@ namespace TransportMayhem.Model
         {
             get 
             {
-                if (p.X >= _width || p.Y >= _height) return null;
+                if (!InBounds(p)) return null;
                 return _gridObjects[p.X, p.Y];
             }
         }

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TransportMayhem.Model;
+using TransportMayhem.Model.GridObjects;
+using TransportMayhem.View;
 
 namespace TransportMayhem.Controller
 {
@@ -14,6 +16,14 @@ namespace TransportMayhem.Controller
     static class InputHandler
     {
         /// <summary>
+        /// The selected rotation
+        /// </summary>
+        private static Rotation _rotation = Rotation.Top;
+        /// <summary>
+        /// Keeps track of the currently selected rotation for objects
+        /// </summary>
+        public static Rotation SelectedRotation { get { return _rotation; } }
+        /// <summary>
         /// Saves the current type
         /// </summary>
         private static Type _inputType;
@@ -22,12 +32,27 @@ namespace TransportMayhem.Controller
         /// </summary>
         public static Type InputType {
             get { return _inputType; }
-            set { _inputType = value; TMConsole.Log("Input Type changed", value); }
+            set { 
+                _inputType = value; 
+                _ghostObject = value == null ? null : GridObject.InstantiateObject(value, 0, 0, 1, 1, _rotation);
+            }
         }
         /// <summary>
         /// The panel which we're listening to for input
         /// </summary>
         private static Panel panel;
+        /// <summary>
+        /// The private field of the ghostobject to notify the user where (s)he's placing an item and where
+        /// </summary>
+        private static GridObject _ghostObject;
+        /// <summary>
+        /// Bool to define wether the ghostobject should be shown
+        /// </summary>
+        private static bool showGhostObject = true;
+        /// <summary>
+        /// The ghostobject to notify the user where (s)he's placing an item and where
+        /// </summary>
+        public static GridObject GhostObject { get { return showGhostObject ? _ghostObject : null; } }
         /// <summary>
         /// When a mouse click is registered on the panel, this event is fired
         /// </summary>
@@ -46,32 +71,41 @@ namespace TransportMayhem.Controller
         /// </summary>
         static void SetupListeners()
         {
-            panel.MouseClick += (object sender, MouseEventArgs e) => { if (OnClick != null) OnClick(e.X, e.Y, e.Button); }; //Send the event
+            panel.MouseClick += panel_MouseClick;
+            panel.MouseMove += panel_MouseMove;
+            panel.MouseLeave += panel_MouseLeave;
+            panel.MouseEnter += panel_MouseEnter;
         }
 
-        public static GridObject GetNewObject(int x, int y, int width = -1, int height = -1)
+
+        static void panel_MouseClick(object sender, MouseEventArgs e)
         {
-            if (InputType == null) return null;
-            int constructorCount = width == -1 ? 2 : 4;
-            Object[] constructorParams = null;
-            Type[] types = null;
-            if(constructorCount == 2)
+            if (e.Button == MouseButtons.Right && _ghostObject != null)
             {
-                types = new Type[] {typeof(int), typeof(int)};
-                constructorParams = new Object[] {x, y};
+                _rotation = RailUtils.Rotate(_rotation);
+                _ghostObject = _inputType == null ? null : GridObject.InstantiateObject(_inputType, 0, 0, 1, 1, _rotation);
             }
-            else if(constructorCount == 4)
+            if (OnClick != null) OnClick(e.X, e.Y, e.Button);
+        }
+
+        static void panel_MouseEnter(object sender, EventArgs e)
+        {
+            showGhostObject = true;
+        }
+
+        static void panel_MouseLeave(object sender, EventArgs e)
+        {
+            showGhostObject = false;
+        }
+
+        static void panel_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_ghostObject == null) return;
+            lock (_ghostObject)
             {
-                types = new Type[] {typeof(int), typeof(int), typeof(int), typeof(int)};
-                constructorParams = new Object[] {x,y,width,height};
+                _ghostObject.X = GraphicsEngine.TranslateToGrid(e.X);
+                _ghostObject.Y = GraphicsEngine.TranslateToGrid(e.Y);
             }
-            System.Reflection.ConstructorInfo ci = InputType.GetConstructor(types);
-            if (ci == null)
-            {
-                TMConsole.LogError("Failed to receive constructorinformation for type.", InputType);
-                return null;
-            } 
-            return ci.Invoke(constructorParams) as GridObject;
         }
     }
 }

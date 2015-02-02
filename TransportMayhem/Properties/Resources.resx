@@ -121,13 +121,32 @@
   <data name="Missing_Texture" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Missing Texture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Rail" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Rail.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Station_Hori" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Station.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Station_Vert" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Station_Vert.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Grass" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Grass.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Rail_BottomLeft_Rails" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Rail_BottomLeft_Rails.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Rail_BottomLeft_Wood" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Rail_BottomLeft_Wood.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Rail_Vert_Rails" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Rail_Vert_Rails.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Rail_Vert_Wood" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Rail_Vert_Wood.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Curved" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\bin\Debug\Curved.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Straight" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\bin\Debug\Straight.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TITLE" xml:space="preserve">
+    <value>Transport Mayhem</value>
+    <comment>The title of the game</comment>
   </data>
 </root>

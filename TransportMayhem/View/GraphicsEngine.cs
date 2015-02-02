@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TransportMayhem.Controller;
 using TransportMayhem.Model;
+using TransportMayhem.Model.GridObjects;
+using TransportMayhem.Model.MovingObjects;
+using TransportMayhem.View.GridRenderers;
 
 namespace TransportMayhem.View
 {
@@ -15,6 +19,11 @@ namespace TransportMayhem.View
     /// </summary>
     class GraphicsEngine
     {
+        private GridObject prevGhostObject = null;
+        /// <summary>
+        /// The location of the ghost object
+        /// </summary>
+        private Point prevGhostLocation = new Point(-1, -1);
         /// <summary>
         /// The graphics object associated with the panel we're drawing in.
         /// </summary>
@@ -28,9 +37,9 @@ namespace TransportMayhem.View
         /// </summary>
         private GameEngine engine;
         /// <summary>
-        /// Bitmap Assets that are loaded
+        /// The Background of the game
         /// </summary>
-        private Bitmap defaultTexture;
+        private Bitmap BackgroundGrass;
         /// <summary>
         /// The pen used to draw the borders of the grid
         /// </summary>
@@ -66,7 +75,9 @@ namespace TransportMayhem.View
         public GraphicsEngine(Graphics g)
         {
             drawHandle = g;
-            GRIDSIZE = 100;
+            drawHandle.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            GRIDSIZE = 50;
+            Renderers.Initialize();
         }
 
         /// <summary>
@@ -97,8 +108,11 @@ namespace TransportMayhem.View
         /// </summary>
         private void LoadAssets()
         {
-            defaultTexture = Properties.Resources.Missing_Texture;
             borderPen = new Pen(Color.Lime);
+            using (Bitmap grass = Properties.Resources.Grass)
+            {
+                BackgroundGrass = new Bitmap(grass, GRIDSIZE, GRIDSIZE);
+            }
         }
 
         /// <summary>
@@ -106,7 +120,6 @@ namespace TransportMayhem.View
         /// </summary>
         private void UnloadAssets()
         {
-            defaultTexture.Dispose();
             borderPen.Dispose();
         }
 
@@ -119,13 +132,22 @@ namespace TransportMayhem.View
             long startTime = Environment.TickCount;
 
             Bitmap frame = new Bitmap(CANVAS_WIDTH, CANVAS_HEIGHT); //This bitmap is used to draw upon on the loop, doing this allows us to only draw 1 image on the panel
+            Bitmap movingFrame = new Bitmap(CANVAS_WIDTH, CANVAS_HEIGHT);
             Graphics frameGraphics = Graphics.FromImage(frame); //Extract the graphics object from the Bitmap
+            Graphics movingGraphics = Graphics.FromImage(movingFrame);
             frameGraphics.Clear(Color.Red);
             IterateGridObjects(frameGraphics);
+            BufferedGraphicsContext buffer = new BufferedGraphicsContext();
+            BufferedGraphics bufferedGraphics = buffer.Allocate(drawHandle, new Rectangle(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT));
             while (render)
             {
                 UpdateGrids(frameGraphics);
-                drawHandle.DrawImageUnscaled(frame, 0, 0);
+                DrawGhostObject(frameGraphics);
+                movingGraphics.Clear(Color.Transparent);
+                DrawMovingObjects(movingGraphics);
+                bufferedGraphics.Graphics.DrawImageUnscaled(frame, 0, 0);
+                bufferedGraphics.Graphics.DrawImageUnscaled(movingFrame, 0, 0);
+                bufferedGraphics.Render();
                 framesRendered++;
                 if (Environment.TickCount >= startTime + 1000) //Each second we update our frames
                 {
@@ -137,12 +159,21 @@ namespace TransportMayhem.View
             //Dispose used frames and bitmaps and assets
             frame.Dispose();
             frameGraphics.Dispose();
+            movingFrame.Dispose();
+            movingGraphics.Dispose();
+            buffer.Dispose();
             UnloadAssets();
             //Sets the renderthread to null, we're done with it
             renderThread = null;
         }
 
-
+        private void DrawMovingObjects(Graphics g)
+        {
+            foreach (MovingObject mo in engine.Grid.MovingObjects)
+            {
+                mo.Renderer.PaintMovingObject(g, mo);
+            }
+        }
 
         /// <summary>
         /// Requests for the GraphicsEngine to update the grid
@@ -171,16 +202,26 @@ namespace TransportMayhem.View
         /// <param name="g">The graphics object</param>
         private void UpdateGrids(Graphics g)
         {
-            Grid grid = engine.Grid;
             lock (GraphicsEngine._updateGrids)
             {
+                
                 foreach (Point p in GraphicsEngine._updateGrids)
-                {
-                    DrawGridOutline(g, p);
-                    DrawGridObject(g, p, grid[p]);
-                }
+                    UpdateGrid(g, p);
                 GraphicsEngine._updateGrids.Clear();
             }
+        }
+        /// <summary>
+        /// Update a single grid
+        /// </summary>
+        /// <param name="g">The graphics object ot paint with</param>
+        /// <param name="p">The point in the grid to paint</param>
+        private void UpdateGrid(Graphics g, Point p)
+        {
+            if (!engine.Grid.InBounds(p)) return;
+            Point drawPoint = TranslateToView(p);
+            DrawBackground(g, drawPoint);
+            DrawGridObject(g, drawPoint, engine.Grid[p]);
+            DrawGridOutline(g, drawPoint);
         }
 
         /// <summary>
@@ -198,10 +239,19 @@ namespace TransportMayhem.View
                 for (int y = 0; y < grid.Height; y++)
                 {
                     p.Y = y;
-                    DrawGridOutline(g, p);
-                    DrawGridObject(g, p, grid[p]);
+                    UpdateGrid(g, p);
                 }
             }
+        }
+
+        /// <summary>
+        /// Calculates the offset of a float number
+        /// </summary>
+        /// <param name="f">The float to calculate the offset off. Must be lower then 1</param>
+        /// <returns>The amount of pixels the offset is</returns>
+        private static int CalculateFloatOffset(float f)
+        {
+            return (int) (GRIDSIZE * f);
         }
 
         /// <summary>
@@ -250,6 +300,32 @@ namespace TransportMayhem.View
         {
             return new Point(TranslateToGrid(p.X), TranslateToGrid(p.Y));
         }
+        /// <summary>
+        /// Translate a floating number to their pixel location
+        /// </summary>
+        /// <param name="x">The x location in the grid to translate</param>
+        /// <param name="y">The y location in the grid to translate</param>
+        /// <returns>A Point object containing the location in the view</returns>
+        public static Point TranslateToView(float x, float y)
+        {
+            int gridX = (int)x, gridY = (int)y;
+            x -= gridX; //x and y now only hold the decimal value
+            y -= gridY;
+            Point p = TranslateToView(new Point(gridX, gridY));
+            p.X += CalculateFloatOffset(x);
+            p.Y += CalculateFloatOffset(y);
+            return p;
+        }
+
+        /// <summary>
+        /// Draws the background of the grid object
+        /// </summary>
+        /// <param name="g">The graphics object to use</param>
+        /// <param name="p">The point where to add the background</param>
+        private void DrawBackground(Graphics g, Point p)
+        {
+            g.DrawImageUnscaled(BackgroundGrass, p);
+        }
 
         /// <summary>
         /// Draws the outline of the grid
@@ -258,7 +334,7 @@ namespace TransportMayhem.View
         /// <param name="p">The point to check for a gridobject</param>
         private void DrawGridOutline(Graphics g, Point p)
         {
-            g.DrawRectangle(borderPen, TranslateToView(p.X), TranslateToView(p.Y), GRIDSIZE, GRIDSIZE);
+            g.DrawRectangle(borderPen, p.X, p.Y, GRIDSIZE, GRIDSIZE);
         }
         /// <summary>
         /// Checks if the given point has a GridObject and draws it if present
@@ -268,7 +344,66 @@ namespace TransportMayhem.View
         private void DrawGridObject(Graphics g, Point p, GridObject go)
         {
             if (go == null) return;
-            go.GridRenderer.RenderGridObject(g, go, p);
+            go.GridRenderer.RenderGridObjectBackground(g, go, p);
+            go.GridRenderer.RenderGridObjectForeground(g, go, p);
+        }
+        /// <summary>
+        /// Resets the ghost object
+        /// </summary>
+        /// <param name="g">The graphics object to draw with, if available.</param>
+        private void ResetGhostObject(Graphics g)
+        {
+            if (g == null)
+                UpdateGrid(prevGhostLocation);
+            else
+                UpdateGrid(g, prevGhostLocation);
+            prevGhostLocation.X = -1;
+            prevGhostObject = null;
+        }
+        /// <summary>
+        /// Draws the ghost object on the screen
+        /// </summary>
+        /// <param name="g">The graphics object to draw with</param>
+        private void DrawGhostObject(Graphics g)
+        {
+            GridObject go = InputHandler.GhostObject;
+            if (go == null)
+            {
+                if (prevGhostObject != null)
+                    ResetGhostObject(g);
+                return;
+            }
+            lock (go) //Lock the object so external sources can't update its location. This is necesary to keep other threads from updating it while we register its location and draw
+            {
+                if (prevGhostLocation != go.Location || prevGhostObject != go)
+                {
+                    if (prevGhostLocation.X >= 0) //if -1 we don't have to update a ghost object cause it wasn't drawn
+                        ResetGhostObject(g);
+                    if (engine.Grid.InBounds(go.Location))
+                    {
+                        Texture map = go.GridRenderer.GetTexture(go);
+                        if (map.BackGround == null && map.ForeGround == null) return;
+                        ColorMatrix colorMatrix = new ColorMatrix( //Greyscale 50% seethrough
+                            new float[][] 
+                            {
+                                new float[] {.3f, .3f, .3f, 0, 0},
+                                new float[] {.59f, .59f, .59f, 0, 0},
+                                new float[] {.11f, .11f, .11f, 0, 0},
+                                new float[] {0, 0, 0, 0.5f, 0},
+                                new float[] {0, 0, 0, 0, 1}
+                            });
+                        ImageAttributes attributes = new ImageAttributes();
+                        attributes.SetColorMatrix(colorMatrix);
+                        Rectangle Rect = new Rectangle(TranslateToView(go.Location), new Size(GRIDSIZE, GRIDSIZE));
+                        if(map.BackGround != null)
+                            g.DrawImage(map.BackGround, Rect, 0, 0, map.BackGround.Width, map.BackGround.Height, GraphicsUnit.Pixel, attributes); //Draw the map ourselves with the attributes defined above
+                        if (map.ForeGround != null)
+                            g.DrawImage(map.ForeGround, Rect, 0, 0, map.ForeGround.Width, map.ForeGround.Height, GraphicsUnit.Pixel, attributes);
+                        prevGhostLocation = go.Location; //SAve the location so we can update it when we're done
+                        prevGhostObject = go;
+                    }
+                } 
+            }
         }
     }
 

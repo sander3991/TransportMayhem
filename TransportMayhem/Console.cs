@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TransportMayhem.Controller;
 using TransportMayhem.Model;
+using TransportMayhem.Model.GridObjects;
 using TransportMayhem.View;
 
 namespace TransportMayhem
@@ -89,6 +90,7 @@ namespace TransportMayhem
             RegisterCommand("help", Help);
             RegisterCommand("stopconsole", Stop, "Stops the console from showing. It will not affect anything else.");
             RegisterCommand("showclicks", ShowClicks, "Print out every time a OnClick event is fired");
+            RegisterCommand("clear", Clear, "Clears the console from all lines");
             title = new string[]
             {
             " _______                                   _     __  __             _ ",
@@ -179,7 +181,7 @@ namespace TransportMayhem
             for (int i = 1; i < title.Length; i++)
                 largestString = Math.Max(largestString, title[i].Length);
             largestString++;
-            Console.Title = "Transport Mayhem Console";
+            Console.Title = String.Format("{0} Console", Properties.Resources.TITLE);
             Console.WindowWidth = Math.Min(largestString, Console.LargestWindowWidth);
             Console.ForegroundColor = COLOR_DEFAULT;
             ConsoleThread.Start();
@@ -201,8 +203,7 @@ namespace TransportMayhem
         /// </summary>
         private static void Loop()
         {
-            foreach(string s in title) //set the title before we start looping
-                Console.WriteLine(s);
+            PrintTitle();
             UpdateHeader(); //set the header before we start looping
             while (!_stopRequested) //start the loop
             {
@@ -257,6 +258,14 @@ namespace TransportMayhem
             return true;
         }
 
+        private static void Clear(string[] args = null)
+        {
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+            PrintTitle();
+            UpdateHeader();
+        }
+
         /// <summary>
         /// Help-command for the console, prints out all commands but itself.
         /// </summary>
@@ -287,6 +296,12 @@ namespace TransportMayhem
             Console.WriteLine("FPS: {0,3}", _fps);
             Console.WriteLine(new string('-', Console.WindowWidth - 1));
             Console.SetCursorPosition(left, Math.Max(top, Console.CursorTop));
+        }
+
+        private static void PrintTitle()
+        {
+            foreach (string s in title) //set the title before we start looping
+                Console.WriteLine(s);
         }
 
         /// <summary>

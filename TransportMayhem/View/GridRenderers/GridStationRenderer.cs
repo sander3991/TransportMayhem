@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TransportMayhem.Model;
+using TransportMayhem.Model.GridObjects;
 
 namespace TransportMayhem.View.GridRenderers
 {
@@ -13,19 +14,35 @@ namespace TransportMayhem.View.GridRenderers
         private Bitmap _stationHorizontal, _stationVertical;
         public GridStationRenderer()
         {
-            Bitmap horizontal = Properties.Resources.Station_Hori;
-            _stationHorizontal = new Bitmap(horizontal, new Size(GlobalVars.GRIDSIZE, GlobalVars.GRIDSIZE));
-            horizontal.Dispose();
-            Bitmap vertical = Properties.Resources.Station_Vert;
-            _stationVertical = new Bitmap(vertical, new Size(GlobalVars.GRIDSIZE, GlobalVars.GRIDSIZE));
-            vertical.Dispose();
+            using (Bitmap horizontal = Properties.Resources.Station_Hori)
+            {
+                _stationHorizontal = new Bitmap(horizontal, new Size(GlobalVars.GRIDSIZE, GlobalVars.GRIDSIZE));
+                horizontal.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                _stationVertical = new Bitmap(horizontal, new Size(GlobalVars.GRIDSIZE, GlobalVars.GRIDSIZE));
+            }
         }
-        public void RenderGridObject(Graphics g, GridObject go, Point p)
+        public void RenderGridObjectBackground(Graphics g, GridObject go, Point p)
         {
             Station station = go as Station;
             if (station == null) return;
-            //TODO: Add logic to define vertical/horizontal
-            g.DrawImageUnscaled(_stationHorizontal, GraphicsEngine.TranslateToView(p));
+            g.DrawImageUnscaled(GetBitmap(station), p);
+        }
+
+        private Bitmap GetBitmap(Station station)
+        {
+            return station.Rotation == Rotation.Top || station.Rotation == Rotation.Bottom ? _stationVertical : _stationHorizontal;
+        }
+
+        public Texture GetTexture(GridObject go)
+        {
+            Station station = go as Station;
+            return station == null ? new Texture() : new Texture(GetBitmap(station), null);
+        }
+
+
+        public void RenderGridObjectForeground(Graphics g, GridObject go, Point p)
+        {
+            return; //No foreground rendering needed yet
         }
     }
 }

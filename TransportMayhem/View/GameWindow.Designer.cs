@@ -51,7 +51,7 @@
             this.MaximizeBox = false;
             this.Name = "GameWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Transport Mayhem";
+            this.Text = Properties.Resources.TITLE;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TransportMayhemForm_FormClosing);
             this.Load += new System.EventHandler(this.TransportMayhemForm_Load);
             this.ResumeLayout(false);

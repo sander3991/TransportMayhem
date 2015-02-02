@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TransportMayhem.Model;
+using TransportMayhem.Model.GridObjects;
 
 namespace TransportMayhem.View.GridRenderers
 {
@@ -51,11 +51,11 @@ namespace TransportMayhem.View.GridRenderers
             renderMaps.Add(type, map);
         }
 
-        public void RenderGridObject(Graphics g, GridObject go, Point p)
+        public void RenderGridObjectBackground(Graphics g, GridObject go, Point p)
         {
             Type type = go.GetType();
             if (renderMaps.ContainsKey(type))
-                g.DrawImageUnscaled(renderMaps[type], GraphicsEngine.TranslateToView(p));
+                g.DrawImageUnscaled(renderMaps[type], p);
             else
             {
                 Point point = new Point();
@@ -70,6 +70,19 @@ namespace TransportMayhem.View.GridRenderers
                     }
                 }
             }
+        }
+
+
+        public Texture GetTexture(GridObject go)
+        {
+            Type type = go.GetType();
+            return renderMaps.ContainsKey(type) ? new Texture(renderMaps[type], null) : new Texture(_defaultTexture, null);
+        }
+
+
+        public void RenderGridObjectForeground(Graphics g, GridObject go, Point p)
+        {
+            return; //no foreground rendered needed
         }
     }
 }

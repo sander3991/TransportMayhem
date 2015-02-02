@@ -30,8 +30,9 @@ namespace TransportMayhem
             InitializeComponent();
             Tuple<Type, Bitmap>[] createButtons = new Tuple<Type, Bitmap>[]
             {
-                new Tuple<Type, Bitmap>(typeof(TransportMayhem.Model.Rail), Properties.Resources.Rail),
-                new Tuple<Type, Bitmap>(typeof(TransportMayhem.Model.Station), Properties.Resources.Station_Hori)
+                new Tuple<Type, Bitmap>(typeof(TransportMayhem.Model.GridObjects.Rail), Properties.Resources.Straight),
+                new Tuple<Type, Bitmap>(typeof(TransportMayhem.Model.GridObjects.CurvedRail), Properties.Resources.Curved),
+                new Tuple<Type, Bitmap>(typeof(TransportMayhem.Model.GridObjects.Station), Properties.Resources.Station_Hori),
             };
             for (int i = 0; i < createButtons.Length; i++)
             {

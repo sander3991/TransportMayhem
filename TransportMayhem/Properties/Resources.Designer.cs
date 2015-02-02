@@ -63,6 +63,26 @@ namespace TransportMayhem.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Curved {
+            get {
+                object obj = ResourceManager.GetObject("Curved", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Grass {
+            get {
+                object obj = ResourceManager.GetObject("Grass", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Missing_Texture {
             get {
                 object obj = ResourceManager.GetObject("Missing_Texture", resourceCulture);
@@ -73,9 +93,39 @@ namespace TransportMayhem.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Rail {
+        internal static System.Drawing.Bitmap Rail_BottomLeft_Rails {
             get {
-                object obj = ResourceManager.GetObject("Rail", resourceCulture);
+                object obj = ResourceManager.GetObject("Rail_BottomLeft_Rails", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Rail_BottomLeft_Wood {
+            get {
+                object obj = ResourceManager.GetObject("Rail_BottomLeft_Wood", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Rail_Vert_Rails {
+            get {
+                object obj = ResourceManager.GetObject("Rail_Vert_Rails", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Rail_Vert_Wood {
+            get {
+                object obj = ResourceManager.GetObject("Rail_Vert_Wood", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,10 +143,19 @@ namespace TransportMayhem.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Station_Vert {
+        internal static System.Drawing.Bitmap Straight {
             get {
-                object obj = ResourceManager.GetObject("Station_Vert", resourceCulture);
+                object obj = ResourceManager.GetObject("Straight", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Transport Mayhem.
+        /// </summary>
+        internal static string TITLE {
+            get {
+                return ResourceManager.GetString("TITLE", resourceCulture);
             }
         }
     }
