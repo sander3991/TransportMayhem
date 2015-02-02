@@ -17,7 +17,7 @@ namespace TransportMayhem.Model.GridObjects
     {
 
         private RailDirections _railDirection;
-        public event Action<Rail> RailUpdated;
+        public event Action<RailArgs> RailUpdated;
         /// <summary>
         /// The rail object defaults to the RailRenderer
         /// </summary>
@@ -28,7 +28,7 @@ namespace TransportMayhem.Model.GridObjects
             protected set { 
                 _railDirection = value;
                 if(RailUpdated != null)
-                    RailUpdated(this);
+                    RailUpdated(new RailArgs(this));
             } 
         }
         /// <summary>

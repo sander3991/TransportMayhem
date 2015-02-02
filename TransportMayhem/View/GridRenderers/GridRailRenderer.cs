@@ -109,6 +109,19 @@ namespace TransportMayhem.View.GridRenderers
             return bitmaps[rail.RailDirection];
         }
 
+        private void RenderNetworkOutline(Graphics g, GridObject go, Point p)
+        {
+            Rail rail = go as Rail;
+            if (rail == null) return;
+            TrainNetwork network = TrainNetworkRegistry.GetNetworkForRail(rail);
+            if (network == null) return;
+            using (Pen pen = new Pen(debugColors[network.ID % debugColors.Length]))
+            {
+                pen.Width = 3;
+                g.DrawRectangle(pen, p.X, p.Y, GlobalVars.GRIDSIZE, GlobalVars.GRIDSIZE);
+            }
+        }
+
         public Texture GetTexture(GridObject go)
         {
             Rail rail = go as Rail;
@@ -118,14 +131,7 @@ namespace TransportMayhem.View.GridRenderers
 
         public void RenderGridObjectForeground(Graphics g, GridObject go, Point p)
         {
-            Rail rail = go as Rail;
-            if (rail == null) return;
-            TrainNetwork network = TrainNetworkRegistry.GetNetworkForRail(rail);
-            using (Pen pen = new Pen(debugColors[network.ID % debugColors.Length]))
-            {
-                pen.Width = 3;
-                g.DrawRectangle(pen, p.X, p.Y, GlobalVars.GRIDSIZE, GlobalVars.GRIDSIZE);
-            }
+            RenderNetworkOutline(g, go, p);
             return; //no foreground rendering needed
         }
     }

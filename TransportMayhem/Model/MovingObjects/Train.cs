@@ -33,8 +33,6 @@ namespace TransportMayhem.Model.MovingObjects
             }
         }
         private float _rotate;
-        private int p1;
-        private int p2;
         public float Rotate
         {
             get { return _rotate; }

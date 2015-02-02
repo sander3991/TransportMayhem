@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TransportMayhem.Model.GridObjects;
 
 namespace TransportMayhem.Model
 {
@@ -171,6 +172,21 @@ namespace TransportMayhem.Model
             p.X += offset.X;
             p.Y += offset.Y;
             return p;
+        }
+
+        public static bool DoRailsAttach(GameObject go1, GameObject go2)
+        {
+            IRail rail1 = go1 as IRail, rail2 = go2 as IRail;
+            if (rail1 == null || rail2 == null) throw new ArgumentException("Gameobjects must implement IRail interface to be compared");
+            foreach (Rotation rail1Rot in RailDirectionToRotation(rail1.RailDirection))
+                if (new Rectangle(GetOffsetForRotation(rail1Rot, go1.Location), new Size(1,1)).IntersectsWith(go2.Rectangle))
+                {
+                    Rotation opposite = OppositeRotation(rail1Rot);
+                    foreach (Rotation rail2Rot in RailDirectionToRotation(rail2.RailDirection))
+                        if (rail2Rot == opposite) return true;
+                    break;
+                }
+            return false;
         }
     }
 }

@@ -122,7 +122,7 @@ namespace TransportMayhem.Model
                     _updateableObjects.Add(updateable);
             IRail rail = go as IRail;
             if (rail != null && RailAdded != null)
-                RailAdded(new RailArgs(rail, go));
+                RailAdded(new RailArgs(go));
             if(ObjectAdded != null)
                 ObjectAdded(go);
         }
@@ -167,7 +167,7 @@ namespace TransportMayhem.Model
                 _updateableObjects.Remove(updateable);
             IRail rail = go as IRail;
             if (rail != null && RailRemoved != null)
-                RailRemoved(new RailArgs(rail, go));
+                RailRemoved(new RailArgs(go));
             if (ObjectRemoved != null) ObjectRemoved(go);
         }
 

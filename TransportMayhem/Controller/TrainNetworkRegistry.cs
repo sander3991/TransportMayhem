@@ -49,7 +49,7 @@ namespace TransportMayhem.Controller
         private static TrainNetwork CombineNetwork(TrainNetwork a, TrainNetwork b)
         {
             if (a == null || b == null) throw new ArgumentException("Can't combine a TrainNetwork that's null!");
-            TrainNetwork newNetwork = a.ID > b.ID ? a + b : b + a;
+            TrainNetwork newNetwork = a.ID > b.ID ? b + a : a + b;
             if (newNetwork == a)
                 UnregisterNetwork(b);
             else
@@ -57,15 +57,7 @@ namespace TransportMayhem.Controller
             return newNetwork;
         }
 
-        private static bool DoRailsAttach(RailArgs rail1, IRail rail2)
-        {
-            Rotation[] newRailDirections = RailUtils.RailDirectionToRotation(rail2.RailDirection);
-            foreach (Rotation newRailRot in newRailDirections)
-                foreach (Rotation railRotation in rail1.Sides)
-                    if (RailUtils.OppositeRotation(railRotation) == newRailRot)
-                        return true;
-            return false;
-        }
+
 
         private static void Grid_RailAdded(RailArgs railArgs)
         {
@@ -82,7 +74,7 @@ namespace TransportMayhem.Controller
                 TrainNetwork newNetwork = GetNetworkForRail(rail2);
                 if (network == null)
                 {
-                    if (DoRailsAttach(railArgs, rail2))
+                    if (RailUtils.DoRailsAttach(railArgs.RawObject, go))
                     {
                         network = newNetwork;
                         network.Add(iRail);
@@ -100,11 +92,21 @@ namespace TransportMayhem.Controller
             if (rail != null) rail.RailUpdated += rail_RailUpdated;
         }
 
-        static void rail_RailUpdated(Rail rail)
+        static void rail_RailUpdated(RailArgs args)
         {
-
+            Rotation[] sides = args.Sides;
+            TrainNetwork network = GetNetworkForRail(args.Rail);
+            foreach (Rotation side in sides)
+            {
+                GameObject go = _grid[RailUtils.GetOffsetForRotation(side, args.RawObject.Location)];
+                if (go == null) continue;
+                IRail rail = go as IRail;
+                if (rail == null) continue;
+                TrainNetwork compareNetwork = GetNetworkForRail(rail);
+                if (network != compareNetwork)
+                    CombineNetwork(network, compareNetwork);
+            }
         }
-
         /// <summary>
         /// Gets the directions for the trains current location in the grid
         /// </summary>

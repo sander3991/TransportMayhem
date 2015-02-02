@@ -26,9 +26,11 @@ namespace TransportMayhem.Controller
         public GameObject RawObject { get { return _raw; } }
         private IRail _rail;
         private GameObject _raw;
-        public RailArgs(IRail rail, GameObject raw)
+        public RailArgs(GameObject raw)
         {
-            if (rail == null || raw == null) throw new ArgumentException("Arguments 'rail' and 'raw' may not be null!");
+            if (raw == null) throw new ArgumentException("Arguments 'rail' and 'raw' may not be null!");
+            IRail rail = raw as IRail;
+            if (rail == null) throw new ArgumentException("Arguments 'rail' and 'raw' may not be null!");
             this._rail = rail;
             this._raw = raw;
 

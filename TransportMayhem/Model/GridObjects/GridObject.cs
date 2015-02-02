@@ -20,21 +20,9 @@ namespace TransportMayhem.Model.GridObjects
         /// </summary>
         private Point _location;
         /// <summary>
-        /// Keeps track of the size of the GridObject
-        /// </summary>
-        private Size _size;
-        /// <summary>
         /// The private field to save the rotation
         /// </summary>
         private Rotation _rotation;
-        /// <summary>
-        /// The height of this GridObject
-        /// </summary>
-        public int Height { get { return _size.Height; } }
-        /// <summary>
-        /// The width of this GridObject
-        /// </summary>
-        public int Width { get { return _size.Width; } }
         /// <summary>
         /// The Left-most X Location of this GridObject in the grid
         /// </summary>
@@ -71,7 +59,8 @@ namespace TransportMayhem.Model.GridObjects
             if (x < 0) throw new ArgumentException("X cannot be negative!");
             if (y < 0) throw new ArgumentException("Y cannot be negative!");
             _location = new Point(x, y);
-            _size = new Size(width, height);
+            Width = width;
+            Height = height;
             _rotation = rotation;
         }
         /// <summary>

@@ -16,5 +16,8 @@ namespace TransportMayhem.Model
         /// The location of the GameObject in the grid
         /// </summary>
         public abstract Point Location { get; protected set; }
+        public int Width { get; protected set; }
+        public int Height { get; protected set; }
+        public Rectangle Rectangle { get { return new Rectangle(Location.X, Location.Y, Width, Height); } }
     }
 }
