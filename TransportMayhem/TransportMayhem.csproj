@@ -130,13 +130,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\Debug\AllTracks.bmp" />
+    <None Include="Resources\Curved.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\Debug\Curved.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="bin\Debug\Straight.bmp" />
+    <None Include="Resources\Straight.bmp" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -154,6 +151,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Debug\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
